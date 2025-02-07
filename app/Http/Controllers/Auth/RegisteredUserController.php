@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;  // Importando JsonResponse
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use App\Notifications\UserNotification;
 use Exception;
 
 class RegisteredUserController extends Controller
@@ -41,6 +42,9 @@ class RegisteredUserController extends Controller
 
             // Logar o usuário após o registro (opcional)
             Auth::login($user);
+
+            // Enviar notificação ao novo usuário
+            $user->notify(new UserNotification());
 
             // Retornar resposta com mensagem de sucesso
             return response()->json([
