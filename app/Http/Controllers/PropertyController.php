@@ -15,17 +15,17 @@ class PropertyController extends Controller
         // Validando os dados de entrada
         $request->validate([
             'properties' => 'required|array',
-            'properties.*.property_number' => 'required|integer|unique:properties,property_number',
-            'properties.*.state' => 'required|string|size:2',
-            'properties.*.city' => 'required|string',
-            'properties.*.neighborhood' => 'required|string',
-            'properties.*.address' => 'required|string',
-            'properties.*.price' => 'required|numeric',
-            'properties.*.appraisal_value' => 'required|numeric',
-            'properties.*.discount' => 'required|numeric',
-            'properties.*.description' => 'required|string',
-            'properties.*.sale_mode' => 'required|string',
-            'properties.*.link' => 'required|url',
+            'properties.*.property_number' => 'integer',
+            'properties.*.state' => 'string|size:2',
+            'properties.*.city' => 'string',
+            'properties.*.neighborhood' => 'string',
+            'properties.*.address' => 'string',
+            'properties.*.price' => 'numeric',
+            'properties.*.appraisal_value' => 'numeric',
+            'properties.*.discount' => 'numeric',
+            'properties.*.description' => 'string',
+            'properties.*.sale_mode' => 'string',
+            'properties.*.link' => 'url',
         ]);
 
         // Inserindo múltiplos imóveis no banco de dados
@@ -35,7 +35,66 @@ class PropertyController extends Controller
         return response()->json([
             'message' => 'Imóveis cadastrados com sucesso!',
             'properties' => $properties
-        ], 201);
+        ], 201)
+        ->header('Access-Control-Allow-Origin', 'http://localhost:5173')  // Adicione o cabeçalho manualmente
+        ->header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+        ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    }
+
+    public function index(Request $request)
+    {
+        $query = Property::query();
+
+        if ($request->has('property_number')) {
+            $query->where('property_number', $request->property_number);
+        }
+        if ($request->has('state')) {
+            $query->where('state', $request->state);
+        }
+        if ($request->has('city')) {
+            $query->where('city', $request->city);
+        }
+        if ($request->has('neighborhood')) {
+            $query->where('neighborhood', $request->neighborhood);
+        }
+        if ($request->has('address')) {
+            $query->where('address', 'like', '%' . $request->address . '%');
+        }
+        if ($request->has('price')) {
+            $query->where('price', $request->price);
+        }
+        if ($request->has('appraisal_value')) {
+            $query->where('appraisal_value', $request->appraisal_value);
+        }
+        if ($request->has('discount')) {
+            $query->where('discount', $request->discount);
+        }
+        if ($request->has('description')) {
+            $query->where('description', 'like', '%' . $request->description . '%');
+        }
+        if ($request->has('sale_mode')) {
+            $query->where('sale_mode', $request->sale_mode);
+        }
+        if ($request->has('link')) {
+            $query->where('link', 'like', '%' . $request->link . '%');
+        }
+
+        $properties = $query->paginate(10);
+
+        return response()->json($properties);
+    }
+
+    public function getUniqueSaleModes()
+    {
+        // Recupera os valores únicos da coluna `sale_mode`, excluindo valores nulos
+        $saleModes = Property::select('sale_mode')
+                             ->whereNotNull('sale_mode')  // Filtra valores nulos
+                             ->distinct()                 // Garante que os valores sejam únicos
+                             ->pluck('sale_mode')         // Extrai os valores da coluna
+                             ->toArray();                 // Converte para um array
+
+        // Retorna os valores como um array JSON
+        return response()->json($saleModes);
     }
 }
 

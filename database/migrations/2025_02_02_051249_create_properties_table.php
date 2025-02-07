@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('properties', function (Blueprint $table) {
             $table->id();
-            $table->integer('property_number')->unique(); // Número único do imóvel
+            $table->string('property_number'); // Número único do imóvel
             $table->string('state', 2); // UF
             $table->string('city'); // Cidade
             $table->string('neighborhood'); // Bairro
