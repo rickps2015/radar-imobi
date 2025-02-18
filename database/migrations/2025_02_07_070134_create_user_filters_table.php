@@ -12,7 +12,7 @@ class CreateUserFiltersTable extends Migration
         Schema::create('user_filters', function (Blueprint $table) {
             $table->id(); // ID único para cada filtro
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Relacionamento com a tabela de usuários
-            $table->integer('property_number')->nullable(); // Número da propriedade
+            $table->string('property_number')->nullable(); // Número da propriedade
             $table->string('state', 2)->nullable(); // Estado
             $table->string('city')->nullable(); // Cidade
             $table->string('neighborhood')->nullable(); // Bairro
