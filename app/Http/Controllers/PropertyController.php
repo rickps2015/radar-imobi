@@ -15,7 +15,7 @@ class PropertyController extends Controller
         // Validando os dados de entrada
         $request->validate([
             'properties' => 'required|array',
-            'properties.*.property_number' => 'integer',
+            'properties.*.property_number' => 'string',
             'properties.*.state' => 'string|size:2',
             'properties.*.city' => 'string',
             'properties.*.neighborhood' => 'string',
@@ -36,7 +36,7 @@ class PropertyController extends Controller
             'message' => 'Imóveis cadastrados com sucesso!',
             'properties' => $properties
         ], 201)
-        ->header('Access-Control-Allow-Origin', 'http://localhost:5173')  // Adicione o cabeçalho manualmente
+        ->header('Access-Control-Allow-Origin', 'http://localhost:5173', 'https://radar-imobi-spa.vercel.app')  // Adicione o cabeçalho manualmente
         ->header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
         ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     }
@@ -72,9 +72,10 @@ class PropertyController extends Controller
         if ($request->has('description')) {
             $query->where('description', 'like', '%' . $request->description . '%');
         }
-        if ($request->has('sale_mode')) {
-            $query->where('sale_mode', $request->sale_mode);
-        }
+        // if ($request->has('sale_mode')) {
+        //     $query->where('sale_mode', $request->sale_mode);
+        // }
+        $query->where('sale_mode', 'Leilão SFI - Edital Único');
         if ($request->has('link')) {
             $query->where('link', 'like', '%' . $request->link . '%');
         }

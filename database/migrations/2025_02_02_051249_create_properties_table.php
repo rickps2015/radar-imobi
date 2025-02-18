@@ -24,6 +24,10 @@ return new class extends Migration
             $table->text('description'); // Descrição
             $table->string('sale_mode'); // Modalidade de venda
             $table->string('link'); // Link de acesso
+            $table->dateTime('primary_leilao_data')->nullable(); // Data do primeiro leilão
+            $table->time('primary_leilao_hora')->nullable(); // Hora do primeiro leilão
+            $table->dateTime('second_leilao_data')->nullable(); // Data do segundo leilão
+            $table->time('second_leilao_hora')->nullable(); // Hora do segundo leilão
             $table->timestamps(); // created_at e updated_at
         });
     }

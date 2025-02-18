@@ -13,7 +13,7 @@ class FilterController extends Controller
         // Validação dos dados recebidos
         $request->validate([
             'user_id' => 'required|exists:users,id', // Verifica se o usuário existe
-            'property_number' => 'nullable|integer',
+            'property_number' => 'nullable|string',
             'state' => 'nullable|string|size:2',
             'city' => 'nullable|string',
             'neighborhood' => 'nullable|string',
@@ -42,6 +42,9 @@ class FilterController extends Controller
             'link' => $request->link,
         ]);
 
+        // Executa o endpoint de scraping
+        app('App\Http\Controllers\ScrapingController')->postLeilaoData($request->property_number);
+
         // Retorna o filtro criado
         return response()->json($userFilter, 201);
     }
@@ -49,8 +52,22 @@ class FilterController extends Controller
     // Método para listar todos os filtros de um usuário
     public function index($userId)
     {
-        $filters = Filter::where('user_id', $userId)->get();
-        return response()->json($filters, 200);
+        // Obtém os filtros do usuário
+        $userFilters = Filter::where('user_id', $userId)->get(['id', 'property_number']);
+
+        // Busca as propriedades correspondentes na tabela properties
+        $propertyNumbers = $userFilters->pluck('property_number');
+        $properties = \DB::table('properties')->whereIn('property_number', $propertyNumbers)->get();
+
+        // Adiciona o id do filtro a cada propriedade
+        $properties = $properties->map(function ($property) use ($userFilters) {
+            $filter = $userFilters->firstWhere('property_number', $property->property_number);
+            $property->filter_id = $filter->id;
+            return $property;
+        });
+
+        // Retorna as propriedades encontradas com o id do filtro
+        return response()->json($properties, 200);
     }
 
     // Método para remover um filtro específico
