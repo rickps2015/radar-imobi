@@ -14,32 +14,17 @@ class FilterController extends Controller
         $request->validate([
             'user_id' => 'required|exists:users,id', // Verifica se o usuário existe
             'property_number' => 'nullable|string',
-            'state' => 'nullable|string|size:2',
-            'city' => 'nullable|string',
-            'neighborhood' => 'nullable|string',
-            'address' => 'nullable|string',
-            'price' => 'nullable|numeric',
-            'appraisal_value' => 'nullable|numeric',
-            'discount' => 'nullable|numeric',
-            'description' => 'nullable|string',
-            'sale_mode' => 'nullable|string',
-            'link' => 'nullable|url',
         ]);
+
+        // Verifica se o property_number existe na tabela properties
+        if ($request->property_number && !\DB::table('properties')->where('property_number', $request->property_number)->exists()) {
+            return response()->json(['message' => 'Não existe este número de propriedade cadastrado!'], 404);
+        }
 
         // Criando o filtro
         $userFilter = Filter::create([
             'user_id' => $request->user_id,
             'property_number' => $request->property_number,
-            'state' => $request->state,
-            'city' => $request->city,
-            'neighborhood' => $request->neighborhood,
-            'address' => $request->address,
-            'price' => $request->price,
-            'appraisal_value' => $request->appraisal_value,
-            'discount' => $request->discount,
-            'description' => $request->description,
-            'sale_mode' => $request->sale_mode,
-            'link' => $request->link,
         ]);
 
         // Executa o endpoint de scraping

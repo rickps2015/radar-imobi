@@ -7,6 +7,7 @@ use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\FilterController;
 use App\Http\Controllers\ScrapingController;
+use App\Http\Controllers\Auth\NewPasswordController;
 
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/properties', [PropertyController::class, 'store']);
@@ -15,6 +16,9 @@ Route::get('/properties', [PropertyController::class, 'index']);
 Route::get('/sale-modes', [PropertyController::class, 'getUniqueSaleModes']);
 Route::post('/scrape', [ScrapingController::class, 'postLeilaoData']);
 
+Route::post('/send-reset-code', [NewPasswordController::class, 'sendResetCode']);
+Route::post('/verify-reset-code', [NewPasswordController::class, 'verifyResetCode']);
+Route::post('/check-reset-code', [NewPasswordController::class, 'checkResetCode']);
 
 Route::prefix('user-filters')->group(function() {
     Route::post('/', [FilterController::class, 'store']); // Rota para criar um novo filtro
