@@ -75,14 +75,39 @@ class PropertyController extends Controller
         // if ($request->has('sale_mode')) {
         //     $query->where('sale_mode', $request->sale_mode);
         // }
-        $query->where('sale_mode', 'Leilão SFI - Edital Único');
+        $query->whereIn('sale_mode', ['Licitação Aberta', 'Leilão SFI - Edital Único']);
         if ($request->has('link')) {
             $query->where('link', 'like', '%' . $request->link . '%');
         }
 
         $properties = $query->paginate(10);
 
-        return response()->json($properties);
+        // Recupera o ID do usuário autenticado
+        // Verifica se o usuário está autenticado
+        if ($request->user()) {
+            $userId = $request->user()->id;
+
+            // Recupera os filtros do usuário
+            $userFilters = \DB::table('user_filters')
+                ->where('user_id', $userId)
+                ->pluck('property_number')
+                ->toArray();
+
+            // Adiciona os parâmetros isNotification e id_notification a cada propriedade
+            $properties->getCollection()->transform(function ($property) use ($userFilters, $userId) {
+                $filter = \DB::table('user_filters')
+                    ->where('user_id', $userId)
+                    ->where('property_number', $property->property_number)
+                    ->first();
+
+                $property->isNotification = !is_null($filter);
+                $property->id_notification = $filter ? $filter->id : null;
+                return $property;
+            });
+        }
+
+        // Retorna as propriedades encontradas com o id do filtro e a propriedade booleana de notificação
+        return response()->json($properties, 200);
     }
 
     public function getUniqueSaleModes()

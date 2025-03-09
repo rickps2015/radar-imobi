@@ -64,17 +64,28 @@ class ScrapingController extends Controller
             $primaryLeilaoParts = explode(' ', $primaryLeilao);
             $secondLeilaoParts = explode(' ', $secondLeilao);
 
+            // Verificar se no item 3 tem 'Licitação'
+            $hasLicitacao = isset($primaryLeilaoParts[3]) && strpos($primaryLeilaoParts[3], 'Licitação') !== false;
+
             // Ajustar o formato da hora
             $primaryLeilaoHora = isset($primaryLeilaoParts[8]) ? str_replace('h', ':', $primaryLeilaoParts[8]) : null;
             $secondLeilaoHora = isset($secondLeilaoParts[8]) ? str_replace('h', ':', $secondLeilaoParts[8]) : null;
 
-            // Salvar os dados na tabela properties
-            \DB::table('properties')->where('property_number', $property_number)->update([
-                'primary_leilao_data' => isset($primaryLeilaoParts[6]) ? \Carbon\Carbon::createFromFormat('d/m/Y', $primaryLeilaoParts[6])->toDateString() : null,
-                'primary_leilao_hora' => $primaryLeilaoHora ? \Carbon\Carbon::createFromFormat('H:i', $primaryLeilaoHora)->toTimeString() : null,
-                'second_leilao_data' => isset($secondLeilaoParts[6]) ? \Carbon\Carbon::createFromFormat('d/m/Y', $secondLeilaoParts[6])->toDateString() : null,
-                'second_leilao_hora' => $secondLeilaoHora ? \Carbon\Carbon::createFromFormat('H:i', $secondLeilaoHora)->toTimeString() : null
-            ]);
+            if (!$hasLicitacao) {
+                // Salvar os dados na tabela properties
+                \DB::table('properties')->where('property_number', $property_number)->update([
+                    'primary_leilao_data' => isset($primaryLeilaoParts[6]) ? \Carbon\Carbon::createFromFormat('d/m/Y', $primaryLeilaoParts[6])->toDateString() : null,
+                    'primary_leilao_hora' => $primaryLeilaoHora ? \Carbon\Carbon::createFromFormat('H:i', $primaryLeilaoHora)->toTimeString() : null,
+                    'second_leilao_data' => isset($secondLeilaoParts[6]) ? \Carbon\Carbon::createFromFormat('d/m/Y', $secondLeilaoParts[6])->toDateString() : null,
+                    'second_leilao_hora' => $secondLeilaoHora ? \Carbon\Carbon::createFromFormat('H:i', $secondLeilaoHora)->toTimeString() : null
+                ]);
+            } else if ($hasLicitacao) {
+                $primaryLeilaoHora = isset($primaryLeilaoParts[8]) ? str_replace('h', ':', $primaryLeilaoParts[8]) : null;
+                \DB::table('properties')->where('property_number', $property_number)->update([
+                    'primary_leilao_data' => isset($primaryLeilaoParts[6]) ? \Carbon\Carbon::createFromFormat('d/m/Y', $primaryLeilaoParts[6])->toDateString() : null,
+                    'primary_leilao_hora' => $primaryLeilaoHora ? \Carbon\Carbon::createFromFormat('H:i', $primaryLeilaoHora)->toTimeString() : null,
+                ]);
+            }
 
             return response()->json(['success' => 'Dados atualizados com sucesso']);
         }

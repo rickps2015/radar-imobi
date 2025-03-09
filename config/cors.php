@@ -19,9 +19,9 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:5173', 'https://radar-imobi-spa.vercel.app', 'https://f682-2804-d4b-8240-e400-5567-a0d0-166f-8a4d.ngrok-free.app'],
+    // 'allowed_origins' => ['http://localhost:5173', 'https://radar-imobi-spa.vercel.app', 'https://f682-2804-d4b-8240-e400-5567-a0d0-166f-8a4d.ngrok-free.app'],
 
-    // 'allowed_origins' => [env('http://localhost:5173', 'http://localhost:3000')],
+    'allowed_origins' => [env('FRONTEND_URL'), 'http://localhost:5173'],
 
     'allowed_origins_patterns' => [],
 
