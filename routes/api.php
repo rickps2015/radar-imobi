@@ -12,7 +12,6 @@ use App\Http\Controllers\Auth\NewPasswordController;
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/properties', [PropertyController::class, 'store']);
 Route::post('/register', [RegisteredUserController::class, 'store']);
-Route::get('/properties', [PropertyController::class, 'index']);
 Route::get('/sale-modes', [PropertyController::class, 'getUniqueSaleModes']);
 Route::post('/scrape', [ScrapingController::class, 'postLeilaoData']);
 
@@ -24,6 +23,10 @@ Route::prefix('user-filters')->group(function() {
     Route::post('/', [FilterController::class, 'store']); // Rota para criar um novo filtro
     Route::get('/{userId}', [FilterController::class, 'index']); // Rota para listar filtros de um usuário
     Route::delete('/{id}', [FilterController::class, 'destroy']);
+});
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/properties', [PropertyController::class, 'index']);
 });
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
