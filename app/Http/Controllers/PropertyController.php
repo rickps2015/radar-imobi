@@ -72,10 +72,12 @@ class PropertyController extends Controller
         if ($request->has('description')) {
             $query->where('description', 'like', '%' . $request->description . '%');
         }
-        // if ($request->has('sale_mode')) {
-        //     $query->where('sale_mode', $request->sale_mode);
-        // }
-        $query->whereIn('sale_mode', ['Licitação Aberta', 'Leilão SFI - Edital Único']);
+        if ($request->has('sale_mode')) {
+            $query->where('sale_mode', $request->sale_mode);
+        }
+        if (empty($request->sale_mode)) {
+            $query->whereIn('sale_mode', ['Licitação Aberta', 'Leilão SFI - Edital Único']);
+        }
         if ($request->has('link')) {
             $query->where('link', 'like', '%' . $request->link . '%');
         }
@@ -114,10 +116,10 @@ class PropertyController extends Controller
     {
         // Recupera os valores únicos da coluna `sale_mode`, excluindo valores nulos
         $saleModes = Property::select('sale_mode')
-                             ->whereNotNull('sale_mode')  // Filtra valores nulos
-                             ->distinct()                 // Garante que os valores sejam únicos
-                             ->pluck('sale_mode')         // Extrai os valores da coluna
-                             ->toArray();                 // Converte para um array
+                     ->whereIn('sale_mode', ['Licitação Aberta', 'Leilão SFI - Edital Único'])  // Filtra apenas os valores desejados
+                     ->distinct()                 // Garante que os valores sejam únicos
+                     ->pluck('sale_mode')         // Extrai os valores da coluna
+                     ->toArray();                 // Converte para um array
 
         // Retorna os valores como um array JSON
         return response()->json($saleModes);
