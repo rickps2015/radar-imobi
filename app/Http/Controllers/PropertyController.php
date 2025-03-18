@@ -82,7 +82,7 @@ class PropertyController extends Controller
             $query->where('link', 'like', '%' . $request->link . '%');
         }
 
-        $properties = $query->paginate(10);
+        $properties = $query->paginate(12);
 
         // Recupera o ID do usuário autenticado
         // Verifica se o usuário está autenticado
@@ -109,6 +109,22 @@ class PropertyController extends Controller
         }
 
         // Retorna as propriedades encontradas com o id do filtro e a propriedade booleana de notificação
+        return response()->json($properties, 200);
+    }
+
+    public function topDiscounted($state, Request $request)
+    {
+        $query = Property::where('state', $state)
+            ->orderBy('discount', 'desc');
+
+        if (empty($request->sale_mode)) {
+            $query->whereIn('sale_mode', ['Licitação Aberta', 'Leilão SFI - Edital Único']);
+        }
+
+        // Recuperar os quatro imóveis com maior taxa de desconto
+        $properties = $query->take(4)->get();
+
+        // Retornar a resposta com os imóveis encontrados
         return response()->json($properties, 200);
     }
 
