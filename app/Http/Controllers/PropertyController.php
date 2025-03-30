@@ -124,6 +124,18 @@ class PropertyController extends Controller
         // Recuperar os quatro imóveis com maior taxa de desconto
         $properties = $query->take(4)->get();
 
+        // Se o array de propriedades for vazio, realizar a mesma pesquisa para o estado de Alagoas (AL)
+        if ($query->take(4)->get()->isEmpty()) {
+            $query = Property::where('state', 'AL')
+            ->orderBy('discount', 'desc');
+
+            if (empty($request->sale_mode)) {
+            $query->whereIn('sale_mode', ['Licitação Aberta', 'Leilão SFI - Edital Único']);
+            }
+
+            $properties = $query->take(4)->get();
+        }
+
         // Retornar a resposta com os imóveis encontrados
         return response()->json($properties, 200);
     }
