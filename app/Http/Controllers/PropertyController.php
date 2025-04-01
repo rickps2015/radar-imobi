@@ -81,6 +81,29 @@ class PropertyController extends Controller
         if ($request->has('link')) {
             $query->where('link', 'like', '%' . $request->link . '%');
         }
+        if ($request->has('order_by')) {
+            $orderBy = $request->order_by;
+
+            switch ($orderBy) {
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'discount_asc':
+                $query->orderBy('discount', 'asc');
+                break;
+            case 'discount_desc':
+                $query->orderBy('discount', 'desc');
+                break;
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+            }
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
 
         $properties = $query->paginate(12);
 
