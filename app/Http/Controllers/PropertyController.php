@@ -175,5 +175,16 @@ class PropertyController extends Controller
         // Retorna os valores como um array JSON
         return response()->json($saleModes);
     }
+
+    public function getPropertiesCountByState()
+    {
+        // Consulta para contar a quantidade de propriedades por estado
+        $propertiesCount = Property::select('state', \DB::raw('COUNT(*) as qtd_properties'))
+            ->groupBy('state')
+            ->get();
+
+        // Retorna o resultado como um array de objetos JSON
+        return response()->json($propertiesCount, 200);
+    }
 }
 
