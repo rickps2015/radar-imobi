@@ -34,10 +34,13 @@ class UserNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
+        $actionUrl = url('https://radar-imobi-spa.vercel.app');
+
         return (new MailMessage)
-                    ->line('Está é uma notificação de imóveis.')
-                    ->action('Está é a ação da notificação: ', url('/'))
-                    ->line('Obrigado por confiar na nossa plataforma!');
+            ->view('emails.user_notification', [
+                'notifiable' => $notifiable,
+                'actionUrl' => $actionUrl,
+            ]);
     }
 
     /**
