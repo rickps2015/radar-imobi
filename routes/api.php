@@ -18,6 +18,7 @@ Route::post('/register', [RegisteredUserController::class, 'store']);
 Route::get('/sale-modes', [PropertyController::class, 'getUniqueSaleModes']);
 Route::post('/scrape', [ScrapingController::class, 'postLeilaoData']);
 Route::get('/properties/top/{state}', [PropertyController::class, 'topDiscounted']);
+Route::get('/properties-count-by-state', [PropertyController::class, 'getPropertiesCountByState']);
 
 Route::post('/send-reset-code', [NewPasswordController::class, 'sendResetCode']);
 Route::post('/verify-reset-code', [NewPasswordController::class, 'verifyResetCode']);
