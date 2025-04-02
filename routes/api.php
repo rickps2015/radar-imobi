@@ -8,6 +8,9 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\FilterController;
 use App\Http\Controllers\ScrapingController;
 use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\SendEmailController;
+
+Route::post('/send-property-emails', [SendEmailController::class, 'sendPropertyEmails']);
 
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/properties', [PropertyController::class, 'store']);
