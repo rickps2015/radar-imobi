@@ -180,11 +180,13 @@ class PropertyController extends Controller
     {
         // Consulta para contar a quantidade de propriedades por estado
         $propertiesCount = Property::select('state', \DB::raw('COUNT(*) as qtd_properties'))
+            ->whereIn('sale_mode', ['Licitação Aberta', 'Leilão SFI - Edital Único'])
             ->groupBy('state')
             ->get();
 
         // Consulta para contar a quantidade de propriedades por cidade
         $propertiesCountByCity = Property::select('state', 'city', \DB::raw('COUNT(*) as qtd_properties'))
+            ->whereIn('sale_mode', ['Licitação Aberta', 'Leilão SFI - Edital Único'])
             ->groupBy('state', 'city')
             ->get();
 
