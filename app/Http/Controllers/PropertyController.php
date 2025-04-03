@@ -183,6 +183,19 @@ class PropertyController extends Controller
             ->groupBy('state')
             ->get();
 
+        // Consulta para contar a quantidade de propriedades por cidade
+        $propertiesCountByCity = Property::select('state', 'city', \DB::raw('COUNT(*) as qtd_properties'))
+            ->groupBy('state', 'city')
+            ->get();
+
+        // Adiciona os dados de cidade ao resultado por estado
+        $propertiesCount->transform(function ($stateData) use ($propertiesCountByCity) {
+            $stateData->data_city = $propertiesCountByCity->filter(function ($cityData) use ($stateData) {
+                return $cityData->state === $stateData->state;
+            })->values();
+            return $stateData;
+        });
+
         // Retorna o resultado como um array de objetos JSON
         return response()->json($propertiesCount, 200);
     }
