@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Property;
 use Illuminate\Http\Request;
+use Stevebauman\Location\Facades\Location;
 
 class PropertyController extends Controller
 {
@@ -200,6 +201,31 @@ class PropertyController extends Controller
 
         // Retorna o resultado como um array de objetos JSON
         return response()->json($propertiesCount, 200);
+    }
+
+    public function getLocation(Request $request)
+    {
+        $ip = $request->ip();
+
+        // Para testar localmente (pois 127.0.0.1 não retorna dados)
+        if ($ip === '127.0.0.1') {
+            $ip = '8.8.8.8'; // IP público fictício do Google
+        }
+
+        $location = Location::get($ip);
+
+        return response()->json([
+            'ip' => $ip,
+            'city' => $location->cityName,
+            'region' => $location->regionName,
+            'region_code' => $location->regionCode,
+            'country' => $location->countryName,
+            'country_code' => $location->countryCode,
+            'latitude' => $location->latitude,
+            'longitude' => $location->longitude,
+            'timezone' => $location->timezone,
+            'postal_code' => $location->postalCode,
+        ]);
     }
 }
 
