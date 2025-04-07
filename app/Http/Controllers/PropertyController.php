@@ -67,8 +67,13 @@ class PropertyController extends Controller
         if ($request->has('appraisal_value')) {
             $query->where('appraisal_value', $request->appraisal_value);
         }
-        if ($request->has('discount')) {
-            $query->where('discount', $request->discount);
+        if ($request->filled('discount_range_primary') && $request->filled('discount_range_secondary')) {
+            $discountRangePrimary = (float) $request->input('discount_range_primary');
+            $discountRangeSecond = (float) $request->input('discount_range_secondary');
+
+            if ($discountRangePrimary <= $discountRangeSecond) {
+                $query->whereBetween('discount', [$discountRangePrimary, $discountRangeSecond]);
+            }
         }
         if ($request->has('description')) {
             $query->where('description', 'like', '%' . $request->description . '%');
