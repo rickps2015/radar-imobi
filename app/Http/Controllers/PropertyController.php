@@ -61,8 +61,19 @@ class PropertyController extends Controller
         if ($request->has('address')) {
             $query->where('address', 'like', '%' . $request->address . '%');
         }
-        if ($request->has('price')) {
-            $query->where('price', $request->price);
+        if ($request->filled('price_min') && $request->filled('price_max')) {
+            $priceMin = (float) $request->input('price_min');
+            $priceMax = (float) $request->input('price_max');
+
+            if ($priceMin <= $priceMax) {
+            $query->whereBetween('price', [$priceMin, $priceMax]);
+            }
+        } elseif ($request->filled('price_min')) {
+            $priceMin = (float) $request->input('price_min');
+            $query->where('price', '>=', $priceMin);
+        } elseif ($request->filled('price_max')) {
+            $priceMax = (float) $request->input('price_max');
+            $query->where('price', '<=', $priceMax);
         }
         if ($request->has('appraisal_value')) {
             $query->where('appraisal_value', $request->appraisal_value);
