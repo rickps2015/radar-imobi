@@ -29,6 +29,15 @@ class PropertyController extends Controller
             'properties.*.link' => 'url',
         ]);
 
+        // Processando os dados para adicionar o campo type_imovel
+        $properties = $request->properties;
+        foreach ($properties as &$property) {
+            if (isset($property['description'])) {
+                $property['type_imovel'] = strtok($property['description'], ',');
+            }
+        }
+        $request->merge(['properties' => $properties]);
+
         // Inserindo múltiplos imóveis no banco de dados
         $properties = Property::insert($request->properties);
 
@@ -88,6 +97,9 @@ class PropertyController extends Controller
         }
         if ($request->has('description')) {
             $query->where('description', 'like', '%' . $request->description . '%');
+        }
+        if ($request->has('type_imovel')) {
+            $query->where('type_imovel', $request->type_imovel);
         }
         if ($request->has('sale_mode')) {
             $query->where('sale_mode', $request->sale_mode);
@@ -191,6 +203,19 @@ class PropertyController extends Controller
 
         // Retorna os valores como um array JSON
         return response()->json($saleModes);
+    }
+
+    public function getUniquePropertyTypes()
+    {
+        // Recupera os valores únicos da coluna `type_imovel`, excluindo valores nulos
+        $propertyTypes = Property::select('type_imovel')
+                         ->distinct()                 // Garante que os valores sejam únicos
+                         ->whereNotNull('type_imovel') // Exclui valores nulos
+                         ->pluck('type_imovel')       // Extrai os valores da coluna
+                         ->toArray();                 // Converte para um array
+
+        // Retorna os valores como um array JSON
+        return response()->json($propertyTypes);
     }
 
     public function getPropertiesCountByState()
