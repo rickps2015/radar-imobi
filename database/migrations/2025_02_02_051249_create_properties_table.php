@@ -22,6 +22,7 @@ return new class extends Migration
             $table->decimal('appraisal_value', 15, 2); // Valor de avaliação
             $table->decimal('discount', 5, 2); // Desconto
             $table->text('description'); // Descrição
+            $table->string('type_imovel')->nullable(); // Tipo do imóvel
             $table->string('sale_mode'); // Modalidade de venda
             $table->string('link'); // Link de acesso
             $table->dateTime('primary_leilao_data')->nullable(); // Data do primeiro leilão
